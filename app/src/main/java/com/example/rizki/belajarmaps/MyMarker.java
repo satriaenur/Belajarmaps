@@ -5,11 +5,11 @@ package com.example.rizki.belajarmaps;
  */
 public class MyMarker {
     private String label;
-    private String icon;
+    private int icon;
     private double _lat;
     private double _long;
 
-    public MyMarker(String label, String icon, double _lat, double _long){
+    public MyMarker(String label, int icon, double _lat, double _long){
         this.label = label;
         this.icon = icon;
         this._lat = _lat;
@@ -20,7 +20,7 @@ public class MyMarker {
         this.label = label;
     }
 
-    public void setIcon(String icon) {
+    public void setIcon(int icon) {
         this.icon = icon;
     }
 
@@ -36,7 +36,7 @@ public class MyMarker {
         return label;
     }
 
-    public String getIcon() {
+    public int getIcon() {
         return icon;
     }
 

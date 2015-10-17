@@ -25,28 +25,43 @@ public class MainActivity extends FragmentActivity{
     private GoogleMap nmap;
     private HashMap<Marker, MyMarker> markerHashMap;
     private ArrayList<MyMarker> myMarker = new ArrayList<MyMarker>();
+    private int a=1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         markerHashMap = new HashMap<Marker, MyMarker>();
         GPSTracker gps = new GPSTracker(getApplicationContext());
-        myMarker.add(new MyMarker("Kampus", "icon1",  gps.getLat(), gps.getLongi()));
-        setUpMap();
+        myMarker.add(new MyMarker("Telkom University\n"+gps.getLat()+", "+gps.getLongi(), R.drawable.student,  gps.getLat(), gps.getLongi()));
+        myMarker.add(new MyMarker("BEC\n-6.908238, 107.6066852", R.drawable.electric,  Double.parseDouble("-6.908238"), Double.parseDouble("107.6066852")));
+        setUpMap(gps);
         plotMarker(myMarker);
     }
 
-    private void setUpMap()
+    private void setUpMap(GPSTracker gps)
     {
         if(nmap==null){
             nmap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment)).getMap();
 
             if(nmap!=null){
+                nmap.getUiSettings().setZoomControlsEnabled(true);
+                nmap.getUiSettings().setMyLocationButtonEnabled(true);
+                nmap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(gps.getLat(), gps.getLongi())));
+                nmap.animateCamera(CameraUpdateFactory.zoomTo(10));
                 nmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         marker.showInfoWindow();
                         return true;
+                    }
+                });
+                nmap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(LatLng latLng) {
+                        Marker marker = nmap.addMarker(new MarkerOptions().position(latLng).title("Long Pressed").icon(BitmapDescriptorFactory.fromResource(R.drawable.pin)));
+                        markerHashMap.put(marker, new MyMarker("Pinned-"+a+"\n"+latLng.latitude+", "+latLng.longitude,R.drawable.pin,latLng.latitude, latLng.longitude));
+                        a++;
+                        nmap.setInfoWindowAdapter(new MarkerInfoWindowAdapter(getApplicationContext(), markerHashMap));
                     }
                 });
             }
@@ -63,7 +78,7 @@ public class MainActivity extends FragmentActivity{
                 markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
                 Marker currentMarker = nmap.addMarker(markerOptions);
                 markerHashMap.put(currentMarker,myMarker);
-                nmap.setInfoWindowAdapter(new MarkerInfoWindowAdapter(getApplicationContext(), myMarker));
+                nmap.setInfoWindowAdapter(new MarkerInfoWindowAdapter(getApplicationContext(), markerHashMap));
             }
         }
     }

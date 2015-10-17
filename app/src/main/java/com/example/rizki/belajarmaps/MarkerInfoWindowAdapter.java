@@ -9,15 +9,17 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.HashMap;
+
 /**
  * Created by wrismawan on 10/18/2015.
  */
 public class MarkerInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
     private Context context;
-    private MyMarker myMarker;
-    public MarkerInfoWindowAdapter(Context context, MyMarker marker){
+    private HashMap<Marker, MyMarker> markers;
+    public MarkerInfoWindowAdapter(Context context, HashMap<Marker, MyMarker> marker){
         this.context = context;
-        this.myMarker = marker;
+        this.markers = marker;
     }
 
 
@@ -30,9 +32,10 @@ public class MarkerInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
     public View getInfoContents(Marker marker) {
         LayoutInflater inf = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inf.inflate(R.layout.marker, null);
+        MyMarker myMarker = markers.get(marker);
         ImageView img = (ImageView)v.findViewById(R.id.imgMark);
         TextView txt = (TextView)v.findViewById(R.id.txtMark);
-        img.setImageResource(R.drawable.location_pin);
+        img.setImageResource(myMarker.getIcon());
         txt.setText(myMarker.getLabel());
         return v;
     }
