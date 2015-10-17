@@ -4,7 +4,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -15,56 +17,54 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback{
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class MainActivity extends FragmentActivity{
 
     private GoogleMap nmap;
-
+    private HashMap<Marker, MyMarker> markerHashMap;
+    private ArrayList<MyMarker> myMarker = new ArrayList<MyMarker>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        SupportMapFragment map = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment);
-        map.getMapAsync(this);
-
-        nmap = map.getMap();
-        nmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
-
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                marker.showInfoWindow();
-                return true;
-            }
-        });
+        markerHashMap = new HashMap<Marker, MyMarker>();
+        GPSTracker gps = new GPSTracker(getApplicationContext());
+        myMarker.add(new MyMarker("Kampus", "icon1",  gps.getLat(), gps.getLongi()));
+        setUpMap();
+        plotMarker(myMarker);
     }
 
-    @Override
-    public void onMapReady(GoogleMap map){
-        GPSTracker gps = new GPSTracker(this);
-        map.setMyLocationEnabled(true);
-        map.getUiSettings().setZoomControlsEnabled(true);
-        map.getUiSettings().setZoomGesturesEnabled(true);
-        if(!gps.canGetLocation()){
-            gps.showSettingAlert();
-        }else {
-            Log.e("test", gps.getLat() + "");
-            Log.e("test", gps.getLongi() + "");
-            LatLng mapCenter = new LatLng(gps.getLat(), gps.getLongi());
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, 17));
+    private void setUpMap()
+    {
+        if(nmap==null){
+            nmap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment)).getMap();
 
-            map.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin))
-                    .position(mapCenter)
-                    .flat(true)
-                    .rotation(245));
-            CameraPosition cameraPosition = CameraPosition.builder()
-                    .target(mapCenter)
-                    .zoom(17)
-                    .bearing(90)
-                    .build();
+            if(nmap!=null){
+                nmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        marker.showInfoWindow();
+                        return true;
+                    }
+                });
+            }
+        }
+        else Toast.makeText(getApplicationContext(), "Unable to create map", Toast.LENGTH_SHORT).show();
+    }
 
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),2000,null);
-
+    private void plotMarker(ArrayList<MyMarker> markers)
+    {
+        if(markers.size()>0){
+            for(MyMarker myMarker : markers)
+            {
+                MarkerOptions markerOptions =  new MarkerOptions().position(new LatLng(myMarker.get_lat(),myMarker.get_long()));
+                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin));
+                Marker currentMarker = nmap.addMarker(markerOptions);
+                markerHashMap.put(currentMarker,myMarker);
+                nmap.setInfoWindowAdapter(new MarkerInfoWindowAdapter(getApplicationContext(), myMarker));
+            }
         }
     }
 }
