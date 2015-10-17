@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback{
 
+    private GoogleMap nmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +27,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment map = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment);
         map.getMapAsync(this);
 
-        GoogleMap nmap = map.getMap();
+        nmap = map.getMap();
         nmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener(){
 
             @Override
@@ -41,23 +42,19 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap map){
         GPSTracker gps = new GPSTracker(this);
         map.setMyLocationEnabled(true);
+        map.getUiSettings().setZoomControlsEnabled(true);
+        map.getUiSettings().setZoomGesturesEnabled(true);
         if(!gps.canGetLocation()){
             gps.showSettingAlert();
         }else {
             Log.e("test", gps.getLat() + "");
             Log.e("test", gps.getLongi() + "");
             LatLng mapCenter = new LatLng(gps.getLat(), gps.getLongi());
-            LatLng kedua = new LatLng(-6.9757899,107.6328453);
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, 17));
 
             map.addMarker(new MarkerOptions()
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin))
                     .position(mapCenter)
-                    .flat(true)
-                    .rotation(245));
-            map.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.location_pin))
-                    .position(kedua)
                     .flat(true)
                     .rotation(245));
             CameraPosition cameraPosition = CameraPosition.builder()
