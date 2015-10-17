@@ -32,7 +32,7 @@ public class MainActivity extends FragmentActivity{
         setContentView(R.layout.activity_main);
         markerHashMap = new HashMap<Marker, MyMarker>();
         GPSTracker gps = new GPSTracker(getApplicationContext());
-        myMarker.add(new MyMarker("Telkom University\n"+gps.getLat()+", "+gps.getLongi(), R.drawable.student,  gps.getLat(), gps.getLongi()));
+        myMarker.add(new MyMarker("Your Location\n"+gps.getLat()+", "+gps.getLongi(), R.drawable.student,  gps.getLat(), gps.getLongi()));
         myMarker.add(new MyMarker("BEC\n-6.908238, 107.6066852", R.drawable.electric,  Double.parseDouble("-6.908238"), Double.parseDouble("107.6066852")));
         setUpMap(gps);
         plotMarker(myMarker);
@@ -44,8 +44,8 @@ public class MainActivity extends FragmentActivity{
             nmap = ((SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment)).getMap();
 
             if(nmap!=null){
+                nmap.setMyLocationEnabled(true);
                 nmap.getUiSettings().setZoomControlsEnabled(true);
-                nmap.getUiSettings().setMyLocationButtonEnabled(true);
                 nmap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(gps.getLat(), gps.getLongi())));
                 nmap.animateCamera(CameraUpdateFactory.zoomTo(10));
                 nmap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
