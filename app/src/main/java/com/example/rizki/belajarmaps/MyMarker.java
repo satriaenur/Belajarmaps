@@ -1,9 +1,13 @@
 package com.example.rizki.belajarmaps;
 
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 /**
  * Created by rizki on 10/17/15.
  */
-public class MyMarker {
+public class MyMarker implements ClusterItem {
     private String label;
     private int icon;
     private double _lat;
@@ -46,5 +50,11 @@ public class MyMarker {
 
     public double get_long() {
         return _long;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        LatLng latlng = new LatLng(get_lat(),get_long());
+        return latlng;
     }
 }
